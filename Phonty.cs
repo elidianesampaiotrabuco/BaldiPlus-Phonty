@@ -1,6 +1,7 @@
 ﻿using MTM101BaldAPI;
 using MTM101BaldAPI.AssetTools;
 using MTM101BaldAPI.Components;
+using Rewired;
 using Steamworks;
 using System;
 using System.Collections;
@@ -10,6 +11,7 @@ using System.Linq;
 using System.Text;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Audio;
 
 namespace PhontyPlus
 {
@@ -69,11 +71,25 @@ namespace PhontyPlus
                 ResetTimer();
             }
         }
+        private IEnumerator DeafenPlayer()
+        {
+            yield return new WaitForSeconds(0.5f);
+            AudioListener.volume = 0.01f;
+            Mod.assetManager.Get<AudioMixer>("Mixer").SetFloat("EchoWetMix", 1f);
+            yield break;
+        }
         public void EndGame(Transform player)
         {
+            var core = Singleton<CoreGameManager>.Instance;
+            if (PhontyMenu.nonLethalConfig.Value == true)
+            {
+                core.audMan.PlaySingle(audios.Get<SoundObject>("shockwave"));
+                behaviorStateMachine.ChangeState(new Phonty_Dead(this));
+                StartCoroutine(DeafenPlayer());
+                return;
+            }
             Time.timeScale = 0f;
             Singleton<MusicManager>.Instance.StopMidi();
-            var core = Singleton<CoreGameManager>.Instance;
             core.disablePause = true;
             core.GetCamera(0).UpdateTargets(transform, 0);
             core.GetCamera(0).offestPos = (player.position - transform.position).normalized * 2f + Vector3.up;
@@ -112,6 +128,14 @@ namespace PhontyPlus
             navigator.maxSpeed = 20f;
             navigator.Entity.SetHeight(7f);
             gameObject.layer = LayerMask.NameToLayer("ClickableEntities");
+
+            var position = IntVector2.GetGridPosition(gameObject.transform.position);
+            var cell = ec.CellFromPosition(position);
+            var startingRoom = cell.room;
+            for (int i = 0; i < startingRoom.TileCount; i++)
+            {
+                this.ec.map.Find(startingRoom.TileAtIndex(i).position.x, startingRoom.TileAtIndex(i).position.z, startingRoom.TileAtIndex(i).ConstBin, startingRoom);
+            }
         }
 
         public void ResetTimer()
@@ -147,6 +171,9 @@ namespace PhontyPlus
             phonty.audMan.QueueRandomAudio(Phonty.records.ToArray());
             phonty.audMan.SetLoop(true);
             phonty.animator.Play("Idle", 1f);
+#if DEBUG
+            timeLeft = 10;
+#endif
         }
         public override void Update()
         {
@@ -160,7 +187,7 @@ namespace PhontyPlus
             }
             phonty.UpdateCounter((int)timeLeft);
         }
-        protected float timeLeft = 180f;
+        protected float timeLeft = PhontyMenu.timeLeftUntilMad.Value;
     }
     public class Phonty_Chase : Phonty_StateBase
     {
@@ -208,6 +235,24 @@ namespace PhontyPlus
             {
                 phonty.EndGame(other.transform);
             }
+        }
+    }
+    public class Phonty_Dead : Phonty_StateBase
+    {
+        public Phonty_Dead(Phonty phonty) : base(phonty)
+        {
+        }
+
+        public override void Enter()
+        {
+            base.Enter();
+            base.ChangeNavigationState(new NavigationState_Disabled(phonty));
+            phonty.angry = true;
+            phonty.totalDisplay.SetActive(false);
+            phonty.mapIcon.gameObject.SetActive(false);
+
+            phonty.animator.Play("Idle", 1f);
+            phonty.animator.SetDefaultAnimation("Idle", 1f);
         }
     }
 }
