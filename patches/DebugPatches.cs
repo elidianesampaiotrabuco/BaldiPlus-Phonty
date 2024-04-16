@@ -8,8 +8,9 @@ using UnityEngine;
 
 namespace PhontyPlus.patches
 {
-    
-    /*[HarmonyPatch(typeof(EnvironmentController), nameof(EnvironmentController.NPCSpawner))]
+#if DEBUG
+
+    [HarmonyPatch(typeof(EnvironmentController), nameof(EnvironmentController.NPCSpawner))]
     public static class InstantMap
     {
         static void Postfix(EnvironmentController __instance, ref IEnumerator __result)
@@ -27,9 +28,9 @@ namespace PhontyPlus.patches
 
             __result = new SimpleEnumerator() { enumerator = __result, postfixAction = postfixAction, prefixAction = prefixAction }.GetEnumerator();
         }
-    }*/
+    }
 
-    /*[HarmonyPatch(typeof(HappyBaldi), nameof(HappyBaldi.Activate))]
+    [HarmonyPatch(typeof(HappyBaldi), nameof(HappyBaldi.Activate))]
     public static class NoHappyBaldi
     {
         static void Prefix(HappyBaldi __instance)
@@ -43,5 +44,6 @@ namespace PhontyPlus.patches
             __instance.sprite.enabled = false;
             GameObject.Destroy(__instance.gameObject);
         }
-    }*/
+    }
+#endif
 }
