@@ -1,12 +1,11 @@
 ﻿using BepInEx;
 using HarmonyLib;
-using JetBrains.Annotations;
 using MTM101BaldAPI;
 using MTM101BaldAPI.AssetTools;
 using MTM101BaldAPI.Components;
 using MTM101BaldAPI.OptionsAPI;
 using MTM101BaldAPI.Registers;
-using System;
+using System.IO;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Audio;
@@ -14,6 +13,8 @@ using UnityEngine.Audio;
 namespace PhontyPlus
 {
     [BepInPlugin("sakyce.baldiplus.phonty", "Phonty", "2.0.4.2")]
+    [BepInDependency("mtm101.rulerp.baldiplus.endlessfloors", BepInDependency.DependencyFlags.SoftDependency)]
+    [BepInDependency("mtm101.rulerp.bbplus.baldidevapi", BepInDependency.DependencyFlags.HardDependency)]
     public unsafe class Mod : BaseUnityPlugin
     {
         public static AssetManager assetManager = new AssetManager();
@@ -33,10 +34,17 @@ namespace PhontyPlus
             EnumExtensions.ExtendEnum<Character>("Phonty");
             LoadingEvents.RegisterOnAssetsLoaded(this.OnAssetsLoaded, false);
             GeneratorManagement.Register(this, GenerationModType.Addend, AddNPCs);
+            try { EndlessFloorsCompatibility.Initialize(); } catch (FileNotFoundException) { }
+#if DEBUG
+            Debug.LogWarning("You're using the DEBUG build of Phonty");
+#endif
 
             CustomOptionsCore.OnMenuInitialize += PhontyMenu.OnMenuInitialize;
             PhontyMenu.Setup();
         }
+
+        
+
         private void AddNPCs(string floorName, int floorNumber, LevelObject floorObject) {
 #if DEBUG
             floorObject.potentialNPCs.Add(new WeightedNPC() { selection = assetManager.Get<NPC>("Phonty"), weight = 1000 });
