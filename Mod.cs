@@ -13,7 +13,7 @@ using UnityEngine.Audio;
 
 namespace PhontyPlus
 {
-    [BepInPlugin("sakyce.baldiplus.phonty", "Phonty", "1.40.0")]
+    [BepInPlugin("sakyce.baldiplus.phonty", "Phonty", "2.0.4.2")]
     public unsafe class Mod : BaseUnityPlugin
     {
         public static AssetManager assetManager = new AssetManager();
