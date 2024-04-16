@@ -45,11 +45,6 @@ namespace PhontyPlus
                 print($"{weighted.weight} , {weighted.selection.name}");
             }
 #endif
-
-            if (floorNumber > 15)
-            {
-                return; // Sorry but I don't want Phonty on floor 99 for obvious reasons
-            }
             if (floorName.StartsWith("F"))
             {
                 floorObject.potentialNPCs.Add(new WeightedNPC() { selection = assetManager.Get<NPC>("Phonty"), weight = 75 });
