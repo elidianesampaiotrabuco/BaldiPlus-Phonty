@@ -3,6 +3,8 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <PluginsDir>BepInEx/plugins</PluginsDir>
+	<OutDir Condition="Exists($(PluginsDir))">$(PluginsDir)/$(AssemblyName)</OutDir>
   </PropertyGroup>
 
   <ItemGroup>
