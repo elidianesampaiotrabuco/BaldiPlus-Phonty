@@ -1,8 +1,5 @@
 ﻿using BaldiEndless;
-using MTM101BaldAPI.AssetTools;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using UnityEngine;
 
 namespace PhontyPlus
 {
@@ -16,8 +13,9 @@ namespace PhontyPlus
         {
 #if DEBUG
             data.npcs.Add(new WeightedNPC() { selection = Mod.assetManager.Get<NPC>("Phonty"), weight = 1000 });
+            data.npcs.ForEach(n => Debug.Log($"{n.weight} , {n.selection.name}"));
 #endif
-            data.npcs.Add(new WeightedNPC() { selection = Mod.assetManager.Get<NPC>("Phonty"), weight = 75 });
+            data.npcs.Add(new WeightedNPC() { selection = Mod.assetManager.Get<NPC>("Phonty"), weight = 100 });
         }
     }
 }
