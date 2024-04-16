@@ -4,10 +4,12 @@ using JetBrains.Annotations;
 using MTM101BaldAPI;
 using MTM101BaldAPI.AssetTools;
 using MTM101BaldAPI.Components;
+using MTM101BaldAPI.OptionsAPI;
 using MTM101BaldAPI.Registers;
 using System;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Audio;
 
 namespace PhontyPlus
 {
@@ -28,24 +30,34 @@ namespace PhontyPlus
             modpath = AssetLoader.GetModPath(this);
             Instance = this;
 
-
             EnumExtensions.ExtendEnum<Character>("Phonty");
             LoadingEvents.RegisterOnAssetsLoaded(this.OnAssetsLoaded, false);
             GeneratorManagement.Register(this, GenerationModType.Addend, AddNPCs);
+
+            CustomOptionsCore.OnMenuInitialize += PhontyMenu.OnMenuInitialize;
+            PhontyMenu.Setup();
         }
         private void AddNPCs(string floorName, int floorNumber, LevelObject floorObject) {
+#if DEBUG
+            floorObject.potentialNPCs.Add(new WeightedNPC() { selection = assetManager.Get<NPC>("Phonty"), weight = 1000 });
+            foreach (var weighted in floorObject.potentialNPCs)
+            {
+                print($"{weighted.weight} , {weighted.selection.name}");
+            }
+#endif
+
             if (floorNumber > 15)
             {
                 return; // Sorry but I don't want Phonty on floor 99 for obvious reasons
             }
             if (floorName.StartsWith("F"))
             {
-                floorObject.potentialNPCs.Add(new WeightedNPC() { selection = assetManager.Get<NPC>("Phonty"), weight = 50 });
+                floorObject.potentialNPCs.Add(new WeightedNPC() { selection = assetManager.Get<NPC>("Phonty"), weight = 75 });
                 floorObject.MarkAsNeverUnload();
             }
             else if (floorName == "END") // Endless
             {
-                floorObject.potentialNPCs.Add(new WeightedNPC() { selection = assetManager.Get<NPC>("Phonty"), weight = 35 });
+                floorObject.potentialNPCs.Add(new WeightedNPC() { selection = assetManager.Get<NPC>("Phonty"), weight = 80 });
                 floorObject.MarkAsNeverUnload();
             }
         }
@@ -80,6 +92,11 @@ namespace PhontyPlus
 
             var clock = (ITM_AlarmClock) ObjectFinders.GetFirstInstance(Items.AlarmClock).item;
             assetManager.Add("windup", clock.audWind);
+
+            var silenceRoom = (from x in Resources.FindObjectsOfTypeAll<SilenceRoomFunction>()
+                           where x.name == "LibraryRoomFunction"
+                           select x).First();
+            assetManager.Add<AudioMixer>("Mixer", silenceRoom.mixer);
 
             assetManager.Add<Phonty>("Phonty", phonty);
             NPCMetaStorage.Instance.Add(new NPCMetadata(Info, new NPC[] { phonty }, "Phonty", NPCFlags.Standard));
