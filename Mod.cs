@@ -55,12 +55,12 @@ namespace PhontyPlus
 #endif
             if (floorName.StartsWith("F"))
             {
-                floorObject.potentialNPCs.Add(new WeightedNPC() { selection = assetManager.Get<NPC>("Phonty"), weight = 75 });
+                floorObject.potentialNPCs.Add(new WeightedNPC() { selection = assetManager.Get<NPC>("Phonty"), weight = PhontyMenu.guaranteeSpawn.Value ? 10000 : 75 });
                 floorObject.MarkAsNeverUnload();
             }
             else if (floorName == "END") // Endless
             {
-                floorObject.potentialNPCs.Add(new WeightedNPC() { selection = assetManager.Get<NPC>("Phonty"), weight = 80 });
+                floorObject.potentialNPCs.Add(new WeightedNPC() { selection = assetManager.Get<NPC>("Phonty"), weight = PhontyMenu.guaranteeSpawn.Value ? 10000 : 80 });
                 floorObject.MarkAsNeverUnload();
             }
         }
