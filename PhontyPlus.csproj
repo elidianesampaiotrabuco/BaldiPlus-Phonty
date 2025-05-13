@@ -4,7 +4,13 @@
         <TargetFramework>netstandard2.0</TargetFramework>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<PluginGamePath>C:\Program Files (x86)\Steam\steamapps\common\Baldi's Basics Plus\BepInEx\plugins\</PluginGamePath>
-    </PropertyGroup>
+
+		<Version>4.0</Version>
+		<FileVersion>$(Version)</FileVersion>
+		<ProductVersion>$(Version)</ProductVersion>
+
+		<AssemblyName>UncertainLuei.$(MSBuildProjectName)</AssemblyName>
+	</PropertyGroup>
 
 	<!-- Post-build event for Debug configuration 
 	<Target Name="PostBuildEventDebug" AfterTargets="PostBuildEvent" Condition="'$(Configuration)' == 'Debug'">
