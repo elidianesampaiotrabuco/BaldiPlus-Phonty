@@ -1,0 +1,12 @@
+{
+  "items": [
+	{ "key": "Phonty_Vfx_Intro", "value": "Start remembering what you hear." },
+	{ "key": "Phonty_Vfx_Angry", "value": "*ANGRY PHONOGRAPH*" },
+	{ "key": "Phonty_Vfx_Record", "value": "*Phonograph music*" },
+	
+	{ "key": "Phonty_Sfx_Shot", "value": "BANG" },
+	
+	{ "key": "Phonty_Pri_1", "value": "Phonty" },
+	{ "key": "Phonty_Pri_2", "value": "A sentient phonograph.\n\nJust make sure that whenever he's playing music, it stays playing!\n<b>OR ELSE!</b>" }
+  ]
+}
