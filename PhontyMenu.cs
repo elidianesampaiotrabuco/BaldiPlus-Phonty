@@ -1,11 +1,10 @@
 ﻿using BepInEx.Configuration;
 using MTM101BaldAPI.OptionsAPI;
-using System;
 using UnityEngine;
 
 namespace PhontyPlus
 {
-    internal class PhontyMenu : MonoBehaviour
+    internal class PhontyMenu : CustomOptionsCategory
     {
         public static ConfigEntry<bool> nonLethalConfig;
         public static ConfigEntry<int> timeLeftUntilMad;
@@ -14,30 +13,34 @@ namespace PhontyPlus
         private MenuToggle nonlethalToggle;
         private MenuToggle guaranteeSpawnToggle;
 
-        private void Initialize(OptionsMenu __instance)
+        public override void Build()
         {
-            nonlethalToggle = CustomOptionsCore.CreateToggleButton(__instance,
-                new Vector2(20f, 0), "NonLethal",
+            nonlethalToggle = CreateToggle(
+                "NonLethal",
+                "Non-Lethal",
                 nonLethalConfig.Value,
-                "If enabled, Phonty will deaf the player instead of ending the game"
+                new Vector2(20f, 0),
+                300f
             );
+            AddTooltip(nonlethalToggle, "If enabled, Phonty will deaf the player instead of ending the game");
             nonlethalToggle.transform.SetParent(transform, false);
             nonlethalToggle.hotspot.GetComponent<StandardMenuButton>().OnPress.AddListener(() => nonLethalConfig.Value = nonlethalToggle.Value);
 
-            guaranteeSpawnToggle = CustomOptionsCore.CreateToggleButton(__instance,
-                new Vector2(20f, -25f), "GuaranteeSpawn",
+            guaranteeSpawnToggle = CreateToggle(
+                "GuaranteeSpawn",
+                "Guarantee Spawn",
                 guaranteeSpawn.Value,
-                "If enabled, Phonty spawn weight will be increased by a thousand"
+                new Vector2(20f, -25f),
+                300f
             );
+            AddTooltip(guaranteeSpawnToggle, "If enabled, Phonty spawn weight will be increased by a thousand");
             guaranteeSpawnToggle.transform.SetParent(transform, false);
             guaranteeSpawnToggle.hotspot.GetComponent<StandardMenuButton>().OnPress.AddListener(() => guaranteeSpawn.Value = guaranteeSpawnToggle.Value);
         }
 
-        internal static void OnMenuInitialize(OptionsMenu __instance)
+        internal static void OnMenuInitialize(OptionsMenu optionsMenu, CustomOptionsHandler handler)
         {
-            var obj = CustomOptionsCore.CreateNewCategory(__instance, "Phonty Phonograph");
-            var phontyMenu = obj.AddComponent<PhontyMenu>();
-            phontyMenu.Initialize(__instance);
+            handler.AddCategory<PhontyMenu>("Phonty Phonograph");
         }
         /// <summary>
         /// Triggered when launching the mod, mostly to setup BepInEx config bindings.

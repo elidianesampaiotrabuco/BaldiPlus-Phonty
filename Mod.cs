@@ -3,17 +3,18 @@ using HarmonyLib;
 using MTM101BaldAPI;
 using MTM101BaldAPI.AssetTools;
 using MTM101BaldAPI.Components;
+using MTM101BaldAPI.ObjectCreation;
 using MTM101BaldAPI.OptionsAPI;
 using MTM101BaldAPI.Registers;
-using System.IO;
+
 using System.Linq;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.Audio;
 
 namespace PhontyPlus
 {
-    [BepInPlugin("sakyce.baldiplus.phonty", "Phonty", "3.0.4.2")]
-    [BepInDependency("mtm101.rulerp.baldiplus.endlessfloors", BepInDependency.DependencyFlags.SoftDependency)]
+    [BepInPlugin("sakyce.baldiplus.phonty", "Phonty", "4.0")]
     [BepInDependency("mtm101.rulerp.bbplus.baldidevapi", BepInDependency.DependencyFlags.HardDependency)]
     public unsafe class Mod : BaseUnityPlugin
     {
@@ -32,12 +33,8 @@ namespace PhontyPlus
             Instance = this;
 
             EnumExtensions.ExtendEnum<Character>("Phonty");
-            LoadingEvents.RegisterOnAssetsLoaded(this.OnAssetsLoaded, false);
+            LoadingEvents.RegisterOnAssetsLoaded(Info, OnAssetsLoaded(), false);
             GeneratorManagement.Register(this, GenerationModType.Addend, AddNPCs);
-            try { EndlessFloorsCompatibility.Initialize(); } catch (FileNotFoundException) { }
-#if DEBUG
-            Debug.LogWarning("You're using the DEBUG build of Phonty");
-#endif
 
             CustomOptionsCore.OnMenuInitialize += PhontyMenu.OnMenuInitialize;
             PhontyMenu.Setup();
@@ -45,37 +42,42 @@ namespace PhontyPlus
 
         
 
-        private void AddNPCs(string floorName, int floorNumber, LevelObject floorObject) {
+        private void AddNPCs(string floorName, int floorNumber, SceneObject sceneObject) {
 #if DEBUG
-            floorObject.potentialNPCs.Add(new WeightedNPC() { selection = assetManager.Get<NPC>("Phonty"), weight = 1000 });
-            foreach (var weighted in floorObject.potentialNPCs)
+            sceneObject.potentialNPCs.Add(new WeightedNPC() { selection = assetManager.Get<NPC>("Phonty"), weight = 1000 });
+            foreach (var weighted in sceneObject.potentialNPCs)
             {
                 print($"{weighted.weight} , {weighted.selection.name}");
             }
 #endif
             if (floorName.StartsWith("F"))
             {
-                floorObject.potentialNPCs.Add(new WeightedNPC() { selection = assetManager.Get<NPC>("Phonty"), weight = PhontyMenu.guaranteeSpawn.Value ? 10000 : 75 });
-                floorObject.MarkAsNeverUnload();
+                sceneObject.potentialNPCs.Add(new WeightedNPC() { selection = assetManager.Get<NPC>("Phonty"), weight = PhontyMenu.guaranteeSpawn.Value ? 10000 : 75 });
+                sceneObject.MarkAsNeverUnload();
             }
             else if (floorName == "END") // Endless
             {
-                floorObject.potentialNPCs.Add(new WeightedNPC() { selection = assetManager.Get<NPC>("Phonty"), weight = PhontyMenu.guaranteeSpawn.Value ? 10000 : 80 });
-                floorObject.MarkAsNeverUnload();
+                sceneObject.potentialNPCs.Add(new WeightedNPC() { selection = assetManager.Get<NPC>("Phonty"), weight = PhontyMenu.guaranteeSpawn.Value ? 10000 : 80 });
+                sceneObject.MarkAsNeverUnload();
             }
         }
-        private void OnAssetsLoaded()
+        private IEnumerator OnAssetsLoaded()
         {
+            yield return 2;
+            yield return "Loading Phonty assets";
             Phonty.LoadAssets();
-            var phonty = ObjectCreators.CreateNPC<Phonty>(
-                "Phonty",
-                EnumExtensions.GetFromExtendedName<Character>("Phonty"),
-                ObjectCreators.CreatePosterObject(new Texture2D[] { AssetLoader.TextureFromMod(this, "poster.png") }),
-                hasLooker: true,
-                usesHeatMap: false,
-                maxAudioDistance: 300,
-                spawnableRooms: new RoomCategory[] { RoomCategory.Faculty }
-            );
+            yield return "Creating Phonty NPC";
+            var phonty = new NPCBuilder<Phonty>(Info)
+                .SetName("Phonty")
+                .SetEnum("Phonty")
+                .SetMetaName("Phonty")
+                .AddMetaFlag(NPCFlags.Standard)
+                .SetPoster(ObjectCreators.CreatePosterObject(new Texture2D[] { AssetLoader.TextureFromMod(this, "poster.png") }))
+                .AddLooker()
+                .SetMinMaxAudioDistance(0, 300)
+                .AddSpawnableRoomCategories(RoomCategory.Faculty)
+                .Build();
+
             phonty.audMan = phonty.GetComponent<AudioManager>();
             CustomSpriteAnimator animator = phonty.gameObject.AddComponent<CustomSpriteAnimator>();
             animator.spriteRenderer = phonty.spriteRenderer[0];
@@ -83,26 +85,25 @@ namespace PhontyPlus
 
             var totalBase = (from x in Resources.FindObjectsOfTypeAll<Transform>()
                              where x.name == "TotalBase"
-                             select x).First<Transform>();
+                             select x).First();
             var clone = GameObject.Instantiate(totalBase).gameObject;
             DontDestroyOnLoad(clone);
             assetManager.Add("TotalBase", clone);
 
             var mapIcon = (from x in Resources.FindObjectsOfTypeAll<NoLateIcon>()
                              where x.name == "MapIcon"
-                             select x).First<NoLateIcon>();
+                             select x).First();
             assetManager.Add("MapIcon", mapIcon);
 
-            var clock = (ITM_AlarmClock) ObjectFinders.GetFirstInstance(Items.AlarmClock).item;
+            var clock = (ITM_AlarmClock)ItemMetaStorage.Instance.FindByEnum(Items.AlarmClock).value.item;
             assetManager.Add("windup", clock.audWind);
 
             var silenceRoom = (from x in Resources.FindObjectsOfTypeAll<SilenceRoomFunction>()
                            where x.name == "LibraryRoomFunction"
                            select x).First();
-            assetManager.Add<AudioMixer>("Mixer", silenceRoom.mixer);
+            assetManager.Add("Mixer", silenceRoom.mixer);
 
-            assetManager.Add<Phonty>("Phonty", phonty);
-            NPCMetaStorage.Instance.Add(new NPCMetadata(Info, new NPC[] { phonty }, "Phonty", NPCFlags.Standard));
+            assetManager.Add("Phonty", phonty);
         }
 
     }
