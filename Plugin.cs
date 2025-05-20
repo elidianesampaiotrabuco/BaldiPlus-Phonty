@@ -22,7 +22,7 @@ namespace PhontyPlus
     {
         public const string ModName = "Phonty";
         public const string ModGuid = "io.github.uncertainluei.baldiplus.phonty";
-        public const string ModVersion = "4.0";
+        public const string ModVersion = "4.0.1";
 
         public static AssetManager assetManager = new AssetManager();
 
@@ -52,8 +52,9 @@ namespace PhontyPlus
             ModdedSaveGame.AddSaveHandler(saveGame);
         }
 
-        public void ReloadSaveTags()
+        public void OverrideConfig()
         {
+            Config.Save();
             saveGame.GenerateTags();
             ModdedFileManager.Instance.RegenerateTags();
         }

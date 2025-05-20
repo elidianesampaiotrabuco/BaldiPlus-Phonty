@@ -72,11 +72,13 @@ namespace PhontyPlus
         private IEnumerator DeafenPlayer()
         {
             yield return new WaitForSeconds(0.5f);
+
             AudioListener.volume = 0.01f;
             Mod.assetManager.Get<AudioMixer>("Mixer").SetFloat("EchoWetMix", 1f);
             deafPlayer = true;
             yield break;
         }
+
         public void EndGame(Transform player)
         {
             var core = CoreGameManager.Instance;
@@ -132,7 +134,8 @@ namespace PhontyPlus
             navigator.SetSpeed(0f);
             navigator.maxSpeed = 0f;
             navigator.Entity.SetHeight(7f);
-            gameObject.layer = LayerMask.NameToLayer("ClickableEntities");
+            navigator.Entity.defaultLayer = LayerMask.NameToLayer("ClickableEntities");
+            gameObject.layer = Navigator.Entity.defaultLayer;
 
             var position = IntVector2.GetGridPosition(gameObject.transform.position);
             var cell = ec.CellFromPosition(position);
@@ -154,10 +157,17 @@ namespace PhontyPlus
             behaviorStateMachine.ChangeState(new Phonty_PlayingMusic(this, true));
         }
 
-        public void UpdateCounter(int count) {
-            counter.SetText(string.Join("", count.ToString().Select(ch => "<sprite=" + ch + ">")));
-            mapIcon.timeText.SetText(count.ToString());
-            mapIcon.UpdatePosition(ec.map);
+        private int currentDisplayTime = -1;
+
+        public void UpdateCounter(int count)
+        {
+            if (count != currentDisplayTime)
+            {
+                currentDisplayTime = Mathf.Max(count, 0);
+                mapIcon.timeText.text = Mathf.Floor(currentDisplayTime / 60).ToString("0") + ":" + (currentDisplayTime % 60).ToString("00");
+                mapIcon.UpdatePosition(ec.map);
+                counter.SetText(string.Join("", count.ToString().Select(ch => "<sprite=" + ch + ">")));
+            }
         }
     }
 

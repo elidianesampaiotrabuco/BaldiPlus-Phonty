@@ -27,7 +27,7 @@ namespace PhontyPlus
             nonlethalToggle.hotspot.GetComponent<StandardMenuButton>().OnPress.AddListener(() =>
             {
                 nonLethalConfig.Value = !nonlethalToggle.Value;
-                Mod.Instance.ReloadSaveTags();
+                Mod.Instance.OverrideConfig();
             });
 
             guaranteeSpawnToggle = CreateToggle(
@@ -42,7 +42,7 @@ namespace PhontyPlus
             guaranteeSpawnToggle.hotspot.GetComponent<StandardMenuButton>().OnPress.AddListener(() =>
             {
                 guaranteeSpawn.Value = !guaranteeSpawn.Value;
-                Mod.Instance.ReloadSaveTags();
+                Mod.Instance.OverrideConfig();
             });
         }
 
