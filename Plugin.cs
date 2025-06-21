@@ -22,7 +22,7 @@ namespace PhontyPlus
     {
         public const string ModName = "Phonty";
         public const string ModGuid = "io.github.uncertainluei.baldiplus.phonty";
-        public const string ModVersion = "4.0.1";
+        public const string ModVersion = "4.0.2";
 
         public static AssetManager assetManager = new AssetManager();
 
@@ -32,11 +32,11 @@ namespace PhontyPlus
         private PhontySaveGameIO saveGame;
 #pragma warning restore CS8618
 
-
         public void Awake()
         {
-            Harmony harmony = new Harmony("sakyce.baldiplus.phonty");
+            Harmony harmony = new Harmony(ModGuid);
             harmony.PatchAllConditionals();
+
             modpath = AssetLoader.GetModPath(this);
             Instance = this;
 
@@ -59,14 +59,8 @@ namespace PhontyPlus
             ModdedFileManager.Instance.RegenerateTags();
         }
 
-        private void GeneratorAddend(string floorName, int floorNumber, SceneObject sceneObject) {
-#if DEBUG
-            sceneObject.potentialNPCs.Add(new WeightedNPC() { selection = assetManager.Get<NPC>("Phonty"), weight = 1000 });
-            foreach (var weighted in sceneObject.potentialNPCs)
-            {
-                print($"{weighted.weight} , {weighted.selection.name}");
-            }
-#else
+        private void GeneratorAddend(string floorName, int floorNumber, SceneObject sceneObject)
+        {
             if (floorName.StartsWith("F"))
             {
                 sceneObject.MarkAsNeverUnload();
@@ -78,7 +72,6 @@ namespace PhontyPlus
                 sceneObject.MarkAsNeverUnload();
                 AddNpc(true, sceneObject);
             }
-#endif
         }
 
         private void AddNpc(bool guaranteeSpawn, SceneObject sceneObject)
@@ -155,9 +148,9 @@ namespace PhontyPlus
         {
             return new string[]
             {
-                PhontyMenu.nonLethalConfig.ToString(),
-                PhontyMenu.timeLeftUntilMad.ToString(),
-                PhontyMenu.guaranteeSpawn.ToString()
+                PhontyMenu.nonLethalConfig.Value.ToString(),
+                PhontyMenu.timeLeftUntilMad.Value.ToString(),
+                PhontyMenu.guaranteeSpawn.Value.ToString()
             };
         }
 

@@ -142,7 +142,7 @@ namespace PhontyPlus
             var startingRoom = cell.room;
             for (int i = 0; i < startingRoom.TileCount; i++)
             {
-                this.ec.map.Find(startingRoom.TileAtIndex(i).position.x, startingRoom.TileAtIndex(i).position.z, startingRoom.TileAtIndex(i).ConstBin, startingRoom);
+                ec.map.Find(startingRoom.TileAtIndex(i).position.x, startingRoom.TileAtIndex(i).position.z, startingRoom.TileAtIndex(i).ConstBin, startingRoom);
             }
         }
 
@@ -239,7 +239,6 @@ namespace PhontyPlus
             phonty.StartCoroutine(Emerge());
             phonty.animator.Play("Emerge", 1f);
             phonty.animator.SetDefaultAnimation("ChaseStatic", 1f);
-
         }
         public override void DestinationEmpty()
         {
