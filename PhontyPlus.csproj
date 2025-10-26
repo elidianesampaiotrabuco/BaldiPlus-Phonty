@@ -3,9 +3,9 @@
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-		<PluginGamePath>C:\Program Files (x86)\Steam\steamapps\common\Baldi's Basics Plus\BepInEx\plugins\</PluginGamePath>
+		<PluginGamePath>D:\files\2025\October\Baldis.Basics.Plus.v0.12.2\Baldis.Basics.Plus.v0.12.2\BepInEx\plugins\</PluginGamePath>
 
-		<Version>4.0.1</Version>
+		<Version>4.0.3</Version>
 		<FileVersion>$(Version)</FileVersion>
 		<ProductVersion>$(Version)</ProductVersion>
 

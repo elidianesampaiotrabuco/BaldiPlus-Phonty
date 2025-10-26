@@ -22,7 +22,7 @@ namespace PhontyPlus
     {
         public const string ModName = "Phonty";
         public const string ModGuid = "io.github.uncertainluei.baldiplus.phonty";
-        public const string ModVersion = "4.0.2";
+        public const string ModVersion = "4.0.3";
 
         public static AssetManager assetManager = new AssetManager();
 
@@ -42,7 +42,7 @@ namespace PhontyPlus
 
             AssetLoader.LocalizationFromFile(Path.Combine(modpath, "Lang_En.json"), Language.English);
 
-            LoadingEvents.RegisterOnAssetsLoaded(Info, OnAssetsLoaded(), false);
+            LoadingEvents.RegisterOnAssetsLoaded(Info, OnAssetsLoaded(), LoadingEventOrder.Pre);
             GeneratorManagement.Register(this, GenerationModType.Addend, GeneratorAddend);
 
             CustomOptionsCore.OnMenuInitialize += PhontyMenu.OnMenuInitialize;

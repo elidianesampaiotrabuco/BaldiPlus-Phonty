@@ -254,10 +254,10 @@ namespace PhontyPlus
                 targetState.UpdatePosition(player.transform.position);
             }
         }
-        public override void OnStateTriggerEnter(Collider other)
+        public override void OnStateTriggerEnter(Collider other, bool validCollision)
         {
-            base.OnStateTriggerEnter(other);
-            if (other.CompareTag("Player") && other.GetComponent<PlayerManager>() == player)
+            base.OnStateTriggerEnter(other, validCollision);
+            if (validCollision && other.CompareTag("Player") && other.GetComponent<PlayerManager>() == player)
             {
                 phonty.EndGame(other.transform);
             }
